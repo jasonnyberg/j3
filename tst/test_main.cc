@@ -6,6 +6,5 @@ int testAll(int argc, char** argv) {
 }
 
 int main(int argc, char *argv[]) {
-    testing::InitGoogleTest();
     return testAll(argc, argv);
 }
