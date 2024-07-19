@@ -23,4 +23,5 @@ target_compile_options(${PROJECT_NAME} PUBLIC "-fPIC")
 #target_link_libraries(${PROJECT_NAME} "-pie -Wl,-E") # requires main
 
 add_executable(${PROJECT_NAME}_tests tst/alloc_tests.cc tst/test_main.cc)
-target_link_libraries(${PROJECT_NAME}_tests gtest pthread dwarf elf dw dl ffi)
+target_link_libraries(${PROJECT_NAME}_tests gtest pthread)
+#target_link_libraries(${PROJECT_NAME}_tests gtest pthread dwarf elf dw dl ffi)
