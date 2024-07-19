@@ -23,7 +23,7 @@ TEST(CompressedPointerTest, ConstructorWithIndexAndOffset) {
 
 TEST(CompressedPointerTest, Dereference) {
     CompressedPointer<int> ptr = CompressedPointer<int>::allocate();
-    *ptr                       = 42;
+    *ptr = 42;
     EXPECT_TRUE(ptr.valid());
     EXPECT_EQ(*ptr, 42);
 }
@@ -34,7 +34,7 @@ TEST(CompressedPointerTest, ArrowOperator) {
     };
 
     CompressedPointer<TestStruct> ptr = CompressedPointer<TestStruct>::allocate();
-    ptr->value                        = 42;
+    ptr->value = 42;
     EXPECT_EQ(ptr->value, 42);
 }
 
@@ -59,38 +59,38 @@ TEST(CompressedPointerTest, Deallocate) {
 
 TEST(CompressedPointerTest, FromRawPtr) {
     CompressedPointer<int> ptr = CompressedPointer<int>::allocate();
-    *ptr                       = 42;
-    int *rawPtr                = ptr; // ptr.operator->();
+    *ptr = 42;
+    int *rawPtr = ptr; // ptr.operator->();
     EXPECT_EQ(*ptr, 42);
     EXPECT_EQ(*rawPtr, 42);
     ptr.deallocate();
 }
 
 TEST(AllocatorTest, Allocate) {
-    Allocator<int>                allocator;
+    Allocator<int> allocator;
     std::pair<uint16_t, uint16_t> result = allocator.allocate();
     EXPECT_NE(result.first + result.second, 0);
 }
 
 TEST(AllocatorTest, Deallocate) {
-    Allocator<int>                allocator;
+    Allocator<int> allocator;
     std::pair<uint16_t, uint16_t> result = allocator.allocate();
     allocator.deallocate(result.first, result.second);
 }
 
 TEST(AllocatorTest, GetPtr) {
-    Allocator<int>                allocator;
+    Allocator<int> allocator;
     std::pair<uint16_t, uint16_t> result = allocator.allocate();
-    int                          *ptr    = allocator.getPtr(result.first, result.second);
-    *ptr                                 = 42;
+    int *ptr = allocator.getPtr(result.first, result.second);
+    *ptr = 42;
     EXPECT_EQ(*ptr, 42);
     allocator.deallocate(result.first, result.second);
 }
 
 TEST(AllocatorTest, GetSlabInfo) {
-    Allocator<int>                allocator;
-    std::pair<uint16_t, uint16_t> result   = allocator.allocate();
-    int                          *rawPtr   = allocator.getPtr(result.first, result.second);
+    Allocator<int> allocator;
+    std::pair<uint16_t, uint16_t> result = allocator.allocate();
+    int *rawPtr = allocator.getPtr(result.first, result.second);
     std::pair<uint16_t, uint16_t> slabInfo = allocator.getSlabInfo(rawPtr);
     EXPECT_EQ(slabInfo.first, result.first);
     EXPECT_EQ(slabInfo.second, result.second);
@@ -106,7 +106,9 @@ TEST(AllocatorTest, AllocateAllElements) {
         std::pair<uint16_t, uint16_t> allocation = allocator.allocate();
         ASSERT_NE(allocation.first + allocation.second, 0);
         allocations.push_back(allocation);
-        if (!(i % 10000)) { std::cout << "Allocated " << i << " elements" << std::endl; }
+        if (!(i % 10000)) {
+            std::cout << "Allocated " << i << " elements" << std::endl;
+        }
     }
 
     // Try to allocate one more element (should return null)
@@ -115,11 +117,13 @@ TEST(AllocatorTest, AllocateAllElements) {
     EXPECT_EQ(nullAllocation.second, 0);
 
     // Deallocate all previously allocated elements
-    for (const auto &allocation : allocations) { allocator.deallocate(allocation.first, allocation.second); }
+    for (const auto &allocation : allocations) {
+        allocator.deallocate(allocation.first, allocation.second);
+    }
 }
 
 struct ComplexItem {
-    int         value;
+    int value;
     std::string name;
 
     ComplexItem(int v, const std::string &n) : value(v), name(n) {}
@@ -127,7 +131,9 @@ struct ComplexItem {
 
     static void *operator new(std::size_t size) {
         void *ptr = CompressedPointer<ComplexItem>::allocate();
-        if (!ptr) { throw std::bad_alloc(); }
+        if (!ptr) {
+            throw std::bad_alloc();
+        }
         return ptr;
     }
 
@@ -139,17 +145,17 @@ struct ComplexItem {
 
 TEST(CompressedPointerTest, ComplexItemTest) {
     CompressedPointer<ComplexItem> ptr = CompressedPointer<ComplexItem>::allocate();
-    ptr->value                         = 42;
-    ptr->name                          = "Hello, World!";
+    ptr->value = 42;
+    ptr->name = "Hello, World!";
     EXPECT_EQ(ptr->value, 42);
     EXPECT_EQ(ptr->name, "Hello, World!");
 }
 
 TEST(CompressedPointerTest, CastTest) {
-    CompressedPointer<ComplexItem> ptr  = CompressedPointer<ComplexItem>::allocate();
-    ptr->value                          = 42;
-    ptr->name                           = "Hello, World!";
-    ComplexItem                   *ci   = ptr;
+    CompressedPointer<ComplexItem> ptr = CompressedPointer<ComplexItem>::allocate();
+    ptr->value = 42;
+    ptr->name = "Hello, World!";
+    ComplexItem *ci = ptr;
     CompressedPointer<ComplexItem> ptr2 = ci;
     EXPECT_EQ(ptr2->value, 42);
     EXPECT_EQ(ptr2->name, "Hello, World!");
@@ -157,8 +163,8 @@ TEST(CompressedPointerTest, CastTest) {
 
 TEST(CompressedPointerTest, ComplexItemFromRawPtr) {
     CompressedPointer<ComplexItem> ptr = CompressedPointer<ComplexItem>::allocate();
-    *ptr                               = ComplexItem(42, "Hello, World!");
-    ComplexItem *rawPtr                = ptr.operator->();
+    *ptr = ComplexItem(42, "Hello, World!");
+    ComplexItem *rawPtr = ptr.operator->();
     EXPECT_EQ(rawPtr->value, 42);
     EXPECT_EQ(rawPtr->name, "Hello, World!");
     ptr.deallocate();
